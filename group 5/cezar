@@ -1,0 +1,57 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int n; cin >> n;
+    vector<string> words(n);
+    vector<int> order(n);
+    for (int i = 0; i < n; i++) cin >> words[i];
+    for (int i = 0; i < n; i++) cin >> order[i];
+    vector<string> newOrder(n);
+    for (int i = 0; i < n; i++) newOrder[i] = words[order[i]-1];
+
+    vector<vector<int>> graph(26);
+    vector<int> degree(26, 0);
+    for (int i = 0; i < n-1; i++){
+        string first = newOrder[i];
+        string second = newOrder[i+1];
+        if (first.size() > second.size() &&
+            first.substr(0, second.size()) == second) {
+            cout << "NE\n";
+            return 0;
+        }
+        for (int j = 0; j < min(first.size(), second.size()); j++){
+            int f = first[j]-97;
+            int s = second[j]-97;
+            if (f != s){
+                degree[s]++;
+                graph[f].push_back(s);
+                break;
+            }
+        }
+    }
+    queue<int> q;
+    for (int i = 0; i < 26; i++) if (degree[i] == 0) q.push(i);
+    vector<int> cypher;
+    while (!q.empty()){
+        int cur = q.front(); q.pop();
+        cypher.push_back(cur);
+        for (int i : graph[cur]){
+            degree[i]--;
+            if (degree[i] == 0) q.push(i);
+        }
+    }
+    if (cypher.size() != 26){
+        cout << "NE" << endl;
+        return 0;
+    }
+    cout << "DA" << "\n";
+    vector<char> ans(26);
+    for (int i = 0; i < 26; i++) ans[cypher[i]] = char('a'+i);
+    for (char i : ans) cout << i;
+    cout << endl;
+    return 0;
+}
